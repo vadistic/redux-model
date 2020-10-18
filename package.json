@@ -13,7 +13,7 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "tsc -p ./tsconfig.build.json",
-    "format": "prettier --write src/**/*.ts",
+    "format": "prettier --write src/**/*.ts -l",
     "lint": "eslint --ext .ts,.tsx src/**/*",
     "typecheck": "tsc -p ./tsconfig.json --noEmit",
     "test": "jest",

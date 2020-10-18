@@ -1,4 +1,4 @@
-import { createStore } from 'redux'
+import { createStore, combineReducers } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 
 import { setupInjectableStore } from '@vadistic/redux-model'
@@ -6,12 +6,11 @@ import { setupInjectableStore } from '@vadistic/redux-model'
 const staticReducers = {}
 
 const composeEnhancers = composeWithDevTools({
-  // Specify here name, actionsBlacklist, actionsCreators and other options
+  // specify here name, actionsBlacklist, actionsCreators and other options
 })
 
 const enhancers = composeEnhancers()
 
-// const reducers = combineReducers(staticReducers)
-const reducers = () => ({})
+const reducers = combineReducers(staticReducers)
 
 export const store = setupInjectableStore(createStore(reducers, enhancers), staticReducers)

@@ -14,9 +14,6 @@ export interface ModelPartial<RO extends AnyRO> extends ModelOptions<RO> {
 export interface Model<RO extends AnyRO> extends ModelOptions<RO> {
   reducer: ModelReducer<RO>
   actions: ModelActions<RO>
-  useActions: () => ModelActions<RO>
-  useHandlers: () => ModelHandlers<RO>
-  useSelector: <Select = InferROState<RO>>(select?: (state: InferROState<RO>) => Select) => Select
 }
 
 // ────────────────────────────────────────────────────────────────────────────────

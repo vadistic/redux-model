@@ -60,19 +60,10 @@ export const createModel = <RO extends AnyRO>(options: ModelOptions<RO>): Model<
   const reducer = createModelReducer<RO>(options)
   const actions = createModelActions<RO>(options)
 
-  const modelPartial: ModelPartial<RO> = { ...options, reducer, actions }
-
-  const useActions = () => useModelActions(modelPartial)
-  const useHandlers = () => useModelHandlers(modelPartial)
-  const useSelector = createModelSelector(modelPartial)
-
   return {
     ...options,
     reducer,
     actions,
-    useActions,
-    useHandlers,
-    useSelector,
   }
 }
 

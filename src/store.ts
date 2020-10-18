@@ -1,61 +1,61 @@
-import { combineReducers } from 'redux';
-import type { Store, Reducer, AnyAction } from 'redux';
+import { combineReducers } from 'redux'
+import type { Store, Reducer, AnyAction } from 'redux'
 
-import { bindModelActions, bindModelHandlers } from './model';
-import { AnyRO } from './types';
+import { bindModelActions, bindModelHandlers } from './model'
+import { AnyRO } from './types'
 
 export interface InjectableStore<S = any, A extends AnyAction = AnyAction> extends Store<S, A> {
-  injectedReducers: Record<string, Reducer>;
-  staticReducers: Record<string, Reducer>;
+  injectedReducers: Record<string, Reducer>
+  staticReducers: Record<string, Reducer>
 
-  boundActions: Record<string, any>;
-  boundHandlers: Record<string, any>;
+  boundActions: Record<string, any>
+  boundHandlers: Record<string, any>
 
-  injectReducer: (scope: string, reducer: Reducer<any, any>) => void;
-  injectReactions: (scope: string, reactions: AnyRO) => void;
+  injectReducer: (scope: string, reducer: Reducer<any, any>) => void
+  injectReactions: (scope: string, reactions: AnyRO) => void
 
-  injectionStatus: (scope: string) => boolean;
+  injectionStatus: (scope: string) => boolean
 }
 
 /**
  *  @see https://redux.js.org/recipes/code-splitting
  */
 export const setupInjectableStore = <S, A extends AnyAction>(
-  store: Store<S, A>,
+  reduxStore: Store<S, A>,
   staticReducers: Record<string, Reducer<any, any>>,
 ) => {
-  const _store = store as InjectableStore<S, A>;
+  const store = reduxStore as InjectableStore<S, A>
 
-  _store.boundActions = {};
-  _store.boundHandlers = {};
+  store.boundActions = {}
+  store.boundHandlers = {}
 
-  _store.injectedReducers = {};
-  _store.staticReducers = staticReducers;
+  store.injectedReducers = {}
+  store.staticReducers = staticReducers
 
-  _store.injectionStatus = key => !!_store.injectedReducers[key];
+  store.injectionStatus = key => !!store.injectedReducers[key]
 
-  _store.injectReactions = (scope, reactions) => {
-    if (!_store.boundActions[scope]) {
-      _store.boundActions[scope] = bindModelActions(scope, reactions, _store.dispatch);
+  store.injectReactions = (scope, reactions) => {
+    if (!store.boundActions[scope]) {
+      store.boundActions[scope] = bindModelActions(scope, reactions, store.dispatch)
     }
 
-    if (!_store.boundHandlers[scope]) {
-      _store.boundHandlers[scope] = bindModelHandlers(scope, reactions, _store.dispatch);
+    if (!store.boundHandlers[scope]) {
+      store.boundHandlers[scope] = bindModelHandlers(scope, reactions, store.dispatch)
     }
-  };
+  }
 
-  _store.injectReducer = (key, asyncReducer) => {
-    if (!_store.injectedReducers[key]) {
-      _store.injectedReducers[key] = asyncReducer;
+  store.injectReducer = (key, asyncReducer) => {
+    if (!store.injectedReducers[key]) {
+      store.injectedReducers[key] = asyncReducer
 
-      _store.replaceReducer(
+      store.replaceReducer(
         combineReducers({
-          ..._store.staticReducers,
-          ..._store.injectedReducers,
+          ...store.staticReducers,
+          ...store.injectedReducers,
         }) as any,
-      );
+      )
     }
-  };
+  }
 
-  return _store;
-};
+  return store
+}
