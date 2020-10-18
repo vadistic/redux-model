@@ -1,9 +1,22 @@
-import { createStore } from 'redux'
+import { render, screen } from '@testing-library/react'
+import event from '@testing-library/user-event'
+import React from 'react'
 
-import { setupInjectableStore } from '../src'
+import { Fixture, getState } from './fixture'
+
+// TODO: setupTests
+import '@testing-library/jest-dom'
 
 describe('setup store', () => {
-  const staticReducers = {}
+  test('works', () => {
+    const app = render(<Fixture />)
 
-  const store = setupInjectableStore(createStore({}), staticReducers)
+    expect(app.getByText('Fixture')).toBeTruthy()
+
+    const button = screen.getByTestId('increment-button')
+
+    expect(getState().test.value).toBe(0)
+    event.click(button)
+    expect(getState().test.value).toBe(1)
+  })
 })

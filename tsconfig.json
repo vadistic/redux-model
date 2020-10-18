@@ -2,10 +2,10 @@
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
-    "jsx": "preserve",
+    "jsx": "react",
     "declaration": true,
     "target": "es2018",
-    "lib": ["esnext"],
+    "lib": ["esnext", "dom"],
 
     "esModuleInterop": true,
     "strict": true,

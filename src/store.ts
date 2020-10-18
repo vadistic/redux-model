@@ -18,6 +18,8 @@ export interface InjectableStore<S = any, A extends AnyAction = AnyAction> exten
 }
 
 /**
+ *  - mutate provided store object !
+ *  - allows for injection for code splliting (and less hassle)
  *  @see https://redux.js.org/recipes/code-splitting
  */
 export const setupInjectableStore = <S, A extends AnyAction>(
