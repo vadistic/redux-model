@@ -1,16 +1,7 @@
 import immer from 'immer'
 import type { AnyAction, Dispatch } from 'redux'
 
-import { useModelActions, useModelHandlers, createModelSelector } from './hooks'
-import type {
-  AnyRO,
-  Model,
-  ModelOptions,
-  ModelActions,
-  ModelHandlers,
-  ModelReducer,
-  ModelPartial,
-} from './types'
+import type { AnyRO, Model, ModelOptions, ModelActions, ModelHandlers, ModelReducer } from './types'
 
 const createModelReducer = <RO extends AnyRO>({
   init,
