@@ -1,6 +1,13 @@
 {
-  "name": "example",
+  "name": "redux-model-example",
   "version": "0.1.0",
+  "description": "react redux syntax with good typescript support and full redux compatibility",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vadistic/redux-model"
+  },
+  "license": "MIT",
+  "author": "Jakub Wadas <vadistic@gmail.com>",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -10,7 +17,7 @@
     "@types/node": "^14.14.0",
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
-    "@vadistic/redux-model": "0.1.0",
+    "@vadistic/redux-model": "latest",
     "immer": "^7.0.14",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
@@ -40,5 +47,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react-redux": "^7.1.9"
   }
 }

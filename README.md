@@ -3,7 +3,10 @@
 > react redux syntax with good typescript support and full redux compatibility
 
 [GITHUB](https://github.com/vadistic/redux-model)
+
 [NPM](https://www.npmjs.com/package/@vadistic/redux-model)
+
+[DEMO](https://redux-model-example.vercel.app)
 
 ## Overview
 
