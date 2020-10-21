@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useMemo, useCallback, useRef } from 'react'
-import { useStore, useSelector, useDispatch } from 'react-redux'
+import { useCallback } from 'react'
+import { useStore, useSelector } from 'react-redux'
 import { AnyAction, Dispatch } from 'redux'
 
 import { InjectableStore } from './store'
@@ -26,51 +26,28 @@ export const useInjectableStore = <S = any, A extends AnyAction = AnyAction>() =
 export const useModelActions = <RO extends AnyRO>(model: ModelPartial<RO>): ModelActions<RO> => {
   const store = useInjectableStore()
 
-  if (model.useInjection) {
-    store.ensureReducersInjected(model)
-  }
-
-  store.ensureActionsInjected(model)
-
-  return store.boundActions[model.scope]
+  return store.getBoundActions(model)
 }
 
 export const useModelHandlers = <RO extends AnyRO>(model: ModelPartial<RO>): ModelHandlers<RO> => {
   const store = useInjectableStore()
 
-  if (model.useInjection) {
-    store.ensureReducersInjected(model)
-  }
-
-  store.ensureHandlersInjected(model)
-
-  return store.boundHandlers[model.scope]
+  return store.getBoundHandlers(model)
 }
 
 export const useModelDispatch = <RO extends AnyRO>(
   model: ModelPartial<RO>,
 ): Dispatch<ScopedActionUnion<RO>> => {
-  const dispatch = useDispatch()
+  const store = useInjectableStore()
+
+  store.ensureReducersInjected(model)
 
   const scopedDispatch = useCallback(
-    (action: AnyAction) => dispatch({ scope: model.scope, ...action }),
-    [dispatch, model],
+    (action: AnyAction) => store.dispatch({ scope: model.scope, ...action }),
+    [store, model],
   ) as Dispatch<ScopedActionUnion<RO>>
 
   return scopedDispatch
-}
-
-export const useModelReset = <RO extends AnyRO>(model: ModelPartial<RO>, deps: any[]): void => {
-  const initRef = useRef<boolean>(true)
-  const dispatch = useModelDispatch(model)
-
-  useMemo(() => {
-    if (!initRef.current) {
-      dispatch({ type: 'RESET' } as any)
-    } else {
-      initRef.current = false
-    }
-  }, [model, ...deps])
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
@@ -79,30 +56,24 @@ export interface UseModel<RO extends AnyRO> {
   dispatch: Dispatch<ScopedActionUnion<RO>>
   actions: ModelActions<RO>
   handlers: ModelHandlers<RO>
+  state: InferROState<RO>
 }
 
 /**
  * create useModel hook with scoped dispatch, handlers and actions
  */
 export const useModel = <RO extends AnyRO>(model: ModelPartial<RO>): UseModel<RO> => {
-  const store = useInjectableStore()
+  const actions = useModelActions(model)
+  const handlers = useModelHandlers(model)
+  const dispatch = useModelDispatch(model)
 
-  const scopedDispatch = useCallback(
-    (action: AnyAction) => store.dispatch({ ...action, scope: model.scope }),
-    [store, model],
-  ) as Dispatch<ScopedActionUnion<RO>>
-
-  if (model.useInjection) {
-    store.ensureReducersInjected(model)
-  }
-
-  store.ensureActionsInjected(model)
-  store.ensureHandlersInjected(model)
+  const state = useModelSelector(model, state => state)
 
   return {
-    dispatch: scopedDispatch,
-    actions: store.boundActions[model.scope],
-    handlers: store.boundHandlers[model.scope],
+    actions,
+    handlers,
+    dispatch,
+    state,
   }
 }
 
@@ -118,6 +89,7 @@ export const createModelSelector = <RO extends AnyRO>(model: ModelPartial<RO>) =
 >(
   select?: (state: InferROState<RO>) => Select,
 ): Select => {
+  // ! hook can be in conditional because this should not change in runtime
   if (model.useInjection) {
     const store = useInjectableStore()
 
@@ -138,6 +110,7 @@ export const useModelSelector = <RO extends AnyRO, Select = InferROState<RO>>(
   model: ModelPartial<RO>,
   select?: (state: InferROState<RO>) => Select,
 ): Select => {
+  // ! hook can be in conditional because this should not change in runtime
   if (model.useInjection) {
     const store = useInjectableStore()
 

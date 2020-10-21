@@ -5,7 +5,9 @@ import { Counter } from './components/Counter'
 export const App: React.FC = () => {
   return (
     <div className="App">
-      <header className="App-header">{false && <Counter />}</header>
+      <header className="App-header">
+        <Counter />
+      </header>
     </div>
   )
 }

@@ -2,7 +2,7 @@ import { combineReducers } from 'redux'
 import type { Store, Reducer, AnyAction } from 'redux'
 
 import { bindModelActions, bindModelHandlers } from './model'
-import { ModelPartial } from './types'
+import { AnyRO, ModelActions, ModelHandlers, ModelPartial } from './types'
 
 export interface InjectableStore<S = any, A extends AnyAction = AnyAction> extends Store<S, A> {
   injectedReducers: Record<string, Reducer>
@@ -11,13 +11,13 @@ export interface InjectableStore<S = any, A extends AnyAction = AnyAction> exten
   boundActions: Record<string, any>
   boundHandlers: Record<string, any>
 
-  areReducersInjected: (scope: string) => boolean
   areActionsInjected: (scope: string) => boolean
   areHandlersInjected: (scope: string) => boolean
 
   ensureReducersInjected: (model: ModelPartial<any>) => void
-  ensureActionsInjected: (model: ModelPartial<any>) => void
-  ensureHandlersInjected: (model: ModelPartial<any>) => void
+
+  getBoundActions: <RO extends AnyRO>(model: ModelPartial<RO>) => ModelActions<RO>
+  getBoundHandlers: <RO extends AnyRO>(model: ModelPartial<RO>) => ModelHandlers<RO>
 }
 
 /**
@@ -37,24 +37,37 @@ export const setupInjectableStore = <S, A extends AnyAction>(
   store.injectedReducers = {}
   store.staticReducers = staticReducers
 
-  store.areReducersInjected = key => !!store.injectedReducers[key]
   store.areActionsInjected = key => !!store.boundActions[key]
   store.areHandlersInjected = key => !!store.boundActions[key]
 
-  store.ensureActionsInjected = model => {
+  store.getBoundActions = model => {
+    store.ensureReducersInjected(model)
+
     if (!store.boundActions[model.scope]) {
       store.boundActions[model.scope] = bindModelActions(model, store.dispatch)
     }
+
+    return store.boundActions[model.scope]
   }
 
-  store.ensureHandlersInjected = model => {
-    if (!store.boundActions[model.scope]) {
+  store.getBoundHandlers = model => {
+    store.ensureReducersInjected(model)
+
+    if (!store.boundHandlers[model.scope]) {
       store.boundHandlers[model.scope] = bindModelHandlers(model, store.dispatch)
     }
+
+    return store.boundHandlers[model.scope]
   }
 
   store.ensureReducersInjected = model => {
     if (!store.injectedReducers[model.scope] && !store.staticReducers[model.scope]) {
+      if (!model.useInjection) {
+        throw Error(
+          `redux-model auto-injection is disabled & there is no reducers for "${model.scope}" scope`,
+        )
+      }
+
       store.injectedReducers[model.scope] = model.reducer as any
 
       store.replaceReducer(
