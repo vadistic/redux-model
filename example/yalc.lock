@@ -1,0 +1,11 @@
+{
+  "version": "v1",
+  "packages": {
+    "@vadistic/redux-model": {
+      "version": "0.1.0",
+      "signature": "1949ce2b0407cc080ae9aa119ce5d357",
+      "link": true,
+      "replaced": "file:.yalc/@vadistic/redux-model"
+    }
+  }
+}

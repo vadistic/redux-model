@@ -1,7 +1,28 @@
 import immer from 'immer'
 import type { AnyAction, Dispatch } from 'redux'
 
-import type { AnyRO, Model, ModelOptions, ModelActions, ModelHandlers, ModelReducer } from './types'
+import type {
+  AnyRO,
+  Model,
+  ModelOptions,
+  ModelActions,
+  ModelHandlers,
+  ModelReducer,
+  ModelPartial,
+} from './types'
+
+export const createModel = <RO extends AnyRO>(options: ModelOptions<RO>): Model<RO> => {
+  const reducer = createModelReducer<RO>(options)
+  const actions = createModelActions<RO>(options)
+
+  return {
+    ...options,
+    reducer,
+    actions,
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────────
 
 const createModelReducer = <RO extends AnyRO>({
   init,
@@ -12,13 +33,14 @@ const createModelReducer = <RO extends AnyRO>({
   if (!state) return init
   if (!action.scope || action.scope !== scope) return state
 
-  if (action.type === 'RESET') {
-    return init
-  }
+  // FIXME: inject typing for default reducers
+  // if (action.type === 'RESET') {
+  //   return init
+  // }
 
-  if (action.type === 'DERIVED') {
-    return { ...state, ...action.payload }
-  }
+  // if (action.type === 'DERIVED') {
+  //   return { ...state, ...action.payload }
+  // }
 
   const reaction = reactions[action.type]
 
@@ -26,7 +48,7 @@ const createModelReducer = <RO extends AnyRO>({
 
   if (useImmer) {
     if (!immer) {
-      throw Error(`Tryning to use immer but it's not isntalled`)
+      throw Error(`react-model is trying to use immer but it's not installed`)
     }
 
     return immer(state, (draft: unknown) => reaction(draft, action.payload))
@@ -47,22 +69,10 @@ const createModelActions = <RO extends AnyRO>({
     {} as any,
   )
 
-export const createModel = <RO extends AnyRO>(options: ModelOptions<RO>): Model<RO> => {
-  const reducer = createModelReducer<RO>(options)
-  const actions = createModelActions<RO>(options)
-
-  return {
-    ...options,
-    reducer,
-    actions,
-  }
-}
-
 // ────────────────────────────────────────────────────────────────────────────────
 
 export const bindModelActions = <RO extends AnyRO>(
-  scope: string,
-  reactions: RO,
+  { scope, reactions }: ModelPartial<RO>,
   dispatch: Dispatch<any>,
 ): ModelActions<RO> =>
   Object.keys(reactions).reduce(
@@ -74,8 +84,7 @@ export const bindModelActions = <RO extends AnyRO>(
   )
 
 export const bindModelHandlers = <RO extends AnyRO>(
-  scope: string,
-  reactions: RO,
+  { scope, reactions }: ModelPartial<RO>,
   dispatch: Dispatch<any>,
 ): ModelHandlers<RO> =>
   Object.keys(reactions).reduce(

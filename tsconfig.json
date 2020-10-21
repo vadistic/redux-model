@@ -3,12 +3,12 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "jsx": "react",
-    "declaration": true,
     "target": "es2018",
     "lib": ["esnext", "dom"],
 
     "esModuleInterop": true,
     "strict": true,
+
     "allowJs": false
   },
   "include": ["src", "test"],
