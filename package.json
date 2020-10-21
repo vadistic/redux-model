@@ -1,6 +1,6 @@
 {
   "name": "@vadistic/redux-model",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "description": "react redux syntax with good typescript support and full redux compatibility",
   "repository": {
@@ -33,6 +33,9 @@
     "immer": "^7.0.14"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.9",
     "@types/jest": "^26.0.15",
     "@types/node": "^14.14.0",
     "@types/react": "^16.9.53",
@@ -49,10 +52,7 @@
     "react-redux": "^7.2.1",
     "redux": "^4.0.5",
     "ts-jest": "^26.4.1",
-    "typescript": "^4.0.3",
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.9"
+    "typescript": "^4.0.3"
   },
   "publishConfig": {
     "access": "public"
