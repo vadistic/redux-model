@@ -1,3 +1,7 @@
+/*
+ * RO = ReactionObject
+ */
+
 export interface ModelOptions<RO extends AnyRO> {
   scope: string
   reactions: RO
@@ -20,16 +24,12 @@ export interface Model<RO extends AnyRO> extends ModelOptions<RO> {
 
 /** take reactions and get actions type */
 export type ModelActions<RO extends AnyRO> = {
-  -readonly [Type in keyof RO]: (
-    payload: InferReactionPayload<RO[Type]>,
-  ) => { type: Type; payload: InferReactionPayload<RO[Type]> }
+  [Type in keyof RO]: ModelAction<Type, RO[Type]>
 }
 
 /** take reactions and get handlers type */
 export type ModelHandlers<RO extends AnyRO> = {
-  -readonly [Type in keyof RO]: (
-    payload: InferReactionPayload<RO[Type]>,
-  ) => () => { type: Type; payload: InferReactionPayload<RO[Type]> }
+  [Type in keyof RO]: ModelHandler<Type, RO[Type]>
 }
 
 /** take reactions and get reducer type */
@@ -38,28 +38,53 @@ export type ModelReducer<RO extends AnyRO> = (
   action: ActionUnion<RO>,
 ) => InferROState<RO>
 
+/** create actions from reaction object */
+export type ModelAction<Type, Reaction> = Reaction extends (state: any, payload: void) => any
+  ? // no payload
+    () => { type: Type; payload: undefined }
+  : Reaction extends (state: any, payload: infer P | undefined) => any
+  ? // optional payload
+    (payload?: P) => { type: Type; payload: P | undefined }
+  : Reaction extends (state: any, payload: infer P) => any
+  ? // required payload
+    (payload: P) => { type: Type; payload: P }
+  : void
+
+/** create handlers from reaction object */
+export type ModelHandler<Type, Reaction> = Reaction extends (state: any, payload: void) => any
+  ? // no payload
+    () => () => { type: Type; payload: undefined }
+  : Reaction extends (state: any, payload: infer P | undefined) => any
+  ? // optional payload
+    (payload?: P) => () => { type: Type; payload: P | undefined }
+  : Reaction extends (state: any, payload: infer P) => any
+  ? // required payload
+    (payload: P) => () => { type: Type; payload: P }
+  : void
+
 // ────────────────────────────────────────────────────────────────────────────────
 
-export type SimpleReaction<S = any> = (state: S) => S
-export type PayloadReaction<S = any, P = any> = (state: S, payload: P) => S
+export type VoidReaction<S = any> = (state: S) => S | undefined
+export type OptionalReaction<S = any, P = any> = (state: S, payload?: P) => S
+export type RequiredReaction<S = any, P = any> = (state: S, payload: P) => S
 
 export type AnyRO = {
-  [type: string]: SimpleReaction | PayloadReaction
+  [type: string]: VoidReaction | OptionalReaction | RequiredReaction
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
 
-export type InferReactionPayload<Reaction> =
-  //
-  Reaction extends SimpleReaction ? void : Reaction extends PayloadReaction<any, infer P> ? P : void
+export type InferReactionPayload<Reaction> = Reaction extends VoidReaction
+  ? undefined
+  : Reaction extends RequiredReaction<any, infer P>
+  ? P
+  : void
 
-export type InferReactionState<Reaction> =
-  //
-  Reaction extends (state: infer S) => any
-    ? S
-    : Reaction extends (state: infer S, payload: any) => any
-    ? S
-    : never
+export type InferReactionState<Reaction> = Reaction extends (state: infer S) => any
+  ? S
+  : Reaction extends (state: infer S, payload: any) => any
+  ? S
+  : never
 
 export type InferROState<RO extends AnyRO> = {
   [Type in keyof RO]: InferReactionState<RO[Type]>
