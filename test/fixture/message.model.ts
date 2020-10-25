@@ -1,19 +1,27 @@
 // CLASSIC REDUX REDUCER
 
 export interface MessageState {
-  message?: string
+  value?: string
 }
 
-const messageInit: MessageState = {
-  message: 'INIT',
+const init: MessageState = {
+  value: undefined,
 }
 
-export const messageReducer = (state = messageInit, action: any) => {
+export const SET_MESSAGE = 'SET_MESSAGE' as const
+export const RESET_MESSAGE = 'RESET_MESSAGE' as const
+
+export type SetMessageAction = { type: typeof SET_MESSAGE; payload: string }
+export type ResetMessageAction = { type: typeof RESET_MESSAGE; payload: undefined }
+
+export type MessageActionUnion = SetMessageAction | ResetMessageAction
+
+export const messageReducer = (state = init, action: MessageActionUnion): MessageState => {
   switch (action.type) {
     case 'SET_MESSAGE':
-      return { ...state, message: action.payload }
+      return { ...state, value: action.payload }
     case 'RESET_MESSAGE':
-      return { ...state, message: undefined }
+      return { ...state, value: undefined }
     default:
       return state
   }
