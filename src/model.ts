@@ -38,7 +38,7 @@ const createModelReducer = <RO extends AnyRO>({
   //   return init
   // }
 
-  // if (action.type === 'DERIVED') {
+  // if (action.type === 'DERIVE') {
   //   return { ...state, ...action.payload }
   // }
 

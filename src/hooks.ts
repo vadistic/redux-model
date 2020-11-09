@@ -88,6 +88,7 @@ export const createModelSelector = <RO extends AnyRO>(model: ModelPartial<RO>) =
   Select = InferROState<RO>
 >(
   select?: (state: InferROState<RO>) => Select,
+  equalityFn?: (left: Select, right: Select) => boolean,
 ): Select => {
   // ! hook can be in conditional because this should not change in runtime
   if (model.useInjection) {
@@ -96,8 +97,9 @@ export const createModelSelector = <RO extends AnyRO>(model: ModelPartial<RO>) =
     store.ensureReducersInjected(model)
   }
 
-  return useSelector(state =>
-    select ? select((state as any)[model.scope]) : (state as any)[model.scope],
+  return useSelector(
+    state => (select ? select((state as any)[model.scope]) : (state as any)[model.scope]),
+    equalityFn,
   )
 }
 
@@ -109,6 +111,7 @@ export const createModelSelector = <RO extends AnyRO>(model: ModelPartial<RO>) =
 export const useModelSelector = <RO extends AnyRO, Select = InferROState<RO>>(
   model: ModelPartial<RO>,
   select?: (state: InferROState<RO>) => Select,
+  equalityFn?: (left: Select, right: Select) => boolean,
 ): Select => {
   // ! hook can be in conditional because this should not change in runtime
   if (model.useInjection) {
@@ -117,7 +120,8 @@ export const useModelSelector = <RO extends AnyRO, Select = InferROState<RO>>(
     store.ensureReducersInjected(model)
   }
 
-  return useSelector(state =>
-    select ? select((state as any)[model.scope]) : (state as any)[model.scope],
+  return useSelector(
+    state => (select ? select((state as any)[model.scope]) : (state as any)[model.scope]),
+    equalityFn,
   )
 }
